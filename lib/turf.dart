@@ -32,6 +32,7 @@ export 'nearest_point_on_line.dart';
 export 'nearest_point.dart';
 export 'point_to_line_distance.dart';
 export 'polygon_smooth.dart';
+export 'polygon_tangents.dart';
 export 'polygon_to_line.dart';
 export 'polygonize.dart';
 export 'polyline.dart';
