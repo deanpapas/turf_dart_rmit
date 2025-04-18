@@ -5,6 +5,7 @@ import 'package:turf/src/meta/feature.dart';
 import 'package:turf/src/meta/flatten.dart';
 import 'package:turf/src/meta/geom.dart';
 import 'package:turf/src/meta/prop.dart';
+import 'package:turf/meta.dart';
 
 Feature<Point> pt = Feature<Point>(
   geometry: Point(coordinates: Position(0, 0)),
@@ -961,4 +962,236 @@ void main() {
       Position.of([-30, -40]),
     ]);
   });
-}
+  
+  // GeoJSON Other Members Support Tests
+  group('GeoJSON Other Members Support:', () {
+    test('Add and retrieve other members from GeoJSONObject', () {
+      final point = Point(coordinates: Position(10, 20));
+      final otherMembers = {'custom_field': 'custom_value', 'metadata': {'source': 'test'}};
+      
+      // Set other members
+      point.setOtherMembers(otherMembers);
+      
+      // Get other members
+      final retrieved = point.otherMembers;
+      
+      // Verify
+      expect(retrieved['custom_field'], equals('custom_value'));
+      expect(retrieved['metadata']['source'], equals('test'));
+    });
+    
+    test('Merge other members with existing ones', () {
+      final point = Point(coordinates: Position(10, 20));
+      
+      // Set initial other members
+      point.setOtherMembers({'field1': 'value1'});
+      
+      // Merge additional members
+      point.mergeOtherMembers({'field2': 'value2', 'metadata': {'created': '2025-04-18'}});
+      
+      // Verify merged result
+      expect(point.otherMembers['field1'], equals('value1'));
+      expect(point.otherMembers['field2'], equals('value2'));
+      expect(point.otherMembers['metadata']['created'], equals('2025-04-18'));
+    });
+    
+    test('Convert GeoJSONObject with other members to JSON', () {
+      final point = Point(coordinates: Position(10, 20));
+      final otherMembers = {'custom_field': 'custom_value'};
+      
+      // Set other members
+      point.setOtherMembers(otherMembers);
+      
+      // Convert to JSON with other members
+      final json = point.toJsonWithOtherMembers();
+      
+      // Verify standard fields
+      expect(json['type'], equals(GeoJSONObjectType.point));
+      expect(json['coordinates'], equals([10, 20]));
+      
+      // Verify other members
+      expect(json['custom_field'], equals('custom_value'));
+    });
+    
+    test('Clone GeoJSONObject with other members', () {
+      final point = Point(coordinates: Position(10, 20));
+      final otherMembers = {'custom_field': 'custom_value'};
+      
+      // Set other members
+      point.setOtherMembers(otherMembers);
+      
+      // Clone with other members
+      final cloned = point.clonePreservingOtherMembers<Point>();
+      
+      // Verify other members were preserved in clone
+      expect(cloned.otherMembers['custom_field'], equals('custom_value'));
+      
+      // Verify clone is a new object but has the same data
+      expect(cloned, isNot(same(point)));
+      expect(cloned.coordinates.lng, equals(10));
+      expect(cloned.coordinates.lat, equals(20));
+    });
+    
+    test('Feature with other members from JSON', () {
+      final json = {
+        'type': GeoJSONObjectType.feature,
+        'geometry': {
+          'type': GeoJSONObjectType.point,
+          'coordinates': [10, 20]
+        },
+        'properties': {'name': 'Test Point'},
+        'custom_field': 'custom_value',
+        'metadata': {'source': 'test'}
+      };
+      
+      // Create Feature with other members
+      final feature = FeatureOtherMembersExtension.fromJsonWithOtherMembers(json);
+      
+      // Verify standard fields
+      expect(feature.type, equals(GeoJSONObjectType.feature));
+      expect(feature.geometry?.type, equals(GeoJSONObjectType.point));
+      expect(feature.properties?['name'], equals('Test Point'));
+      
+      // Verify other members
+      expect(feature.otherMembers['custom_field'], equals('custom_value'));
+      expect(feature.otherMembers['metadata']['source'], equals('test'));
+    });
+    
+    test('FeatureCollection with other members from JSON', () {
+      final json = {
+        'type': GeoJSONObjectType.featureCollection,
+        'features': [
+          {
+            'type': GeoJSONObjectType.feature,
+            'geometry': {
+              'type': GeoJSONObjectType.point,
+              'coordinates': [10, 20]
+            },
+            'properties': {'name': 'Test Point'}
+          }
+        ],
+        'custom_field': 'custom_value'
+      };
+      
+      // Create FeatureCollection with other members
+      final featureCollection = FeatureCollectionOtherMembersExtension.fromJsonWithOtherMembers(json);
+      
+      // Verify standard fields
+      expect(featureCollection.type, equals(GeoJSONObjectType.featureCollection));
+      expect(featureCollection.features.length, equals(1));
+      
+      // Verify other members
+      expect(featureCollection.otherMembers['custom_field'], equals('custom_value'));
+    });
+    
+    test('GeometryObject with other members from JSON', () {
+      final json = {
+        'type': GeoJSONObjectType.point,
+        'coordinates': [10, 20],
+        'custom_field': 'custom_value'
+      };
+      
+      // Create GeometryObject with other members
+      final geometry = GeometryObjectOtherMembersExtension.fromJsonWithOtherMembers(json);
+      
+      // Verify standard fields
+      expect(geometry.type, equals(GeoJSONObjectType.point));
+      expect((geometry as Point).coordinates.lng, equals(10));
+      expect(geometry.coordinates.lat, equals(20));
+      
+      // Verify other members
+      expect(geometry.otherMembers['custom_field'], equals('custom_value'));
+    });
+    
+    test('Extract other members utility function', () {
+      final json = {
+        'type': GeoJSONObjectType.point,
+        'coordinates': [10, 20],
+        'custom_field1': 'value1',
+        'custom_field2': 'value2'
+      };
+      
+      final standardKeys = ['type', 'coordinates'];
+      final otherMembers = extractOtherMembers(json, standardKeys);
+      
+      expect(otherMembers.length, equals(2));
+      expect(otherMembers['custom_field1'], equals('value1'));
+      expect(otherMembers['custom_field2'], equals('value2'));
+      expect(otherMembers.containsKey('type'), isFalse);
+      expect(otherMembers.containsKey('coordinates'), isFalse);
+    });
+    
+    group('copyWithPreservingOtherMembers functionality:', () {
+      test('Feature copyWithPreservingOtherMembers preserves other members', () {
+        final feature = Feature(
+          geometry: Point(coordinates: Position(10, 20)),
+          properties: {'name': 'Original Point'},
+        );
+        final otherMembers = {'custom_field': 'custom_value'};
+        
+        // Set other members
+        feature.setOtherMembers(otherMembers);
+        
+        // Create a new feature with modified properties
+        final modifiedFeature = feature.copyWithPreservingOtherMembers<Point>(
+          properties: {'name': 'Modified Point'},
+        );
+        
+        // Verify properties were updated
+        expect(modifiedFeature.properties?['name'], equals('Modified Point'));
+        
+        // Verify other members were preserved
+        expect(modifiedFeature.otherMembers['custom_field'], equals('custom_value'));
+      });
+      
+      test('FeatureCollection copyWithPreservingOtherMembers preserves other members', () {
+        final featureCollection = FeatureCollection(
+          features: [
+            Feature(
+              geometry: Point(coordinates: Position(10, 20)),
+              properties: {'name': 'Point 1'},
+            ),
+          ],
+        );
+        final otherMembers = {'custom_field': 'custom_value'};
+        
+        // Set other members
+        featureCollection.setOtherMembers(otherMembers);
+        
+        // Create a new feature collection with modified features
+        final modifiedCollection = featureCollection.copyWithPreservingOtherMembers<Point>(
+          features: [
+            Feature(
+              geometry: Point(coordinates: Position(30, 40)),
+              properties: {'name': 'Point 2'},
+            ),
+          ],
+        );
+        
+        // Verify features were updated
+        expect(modifiedCollection.features.length, equals(1));
+        expect(modifiedCollection.features[0].properties?['name'], equals('Point 2'));
+        
+        // Verify other members were preserved
+        expect(modifiedCollection.otherMembers['custom_field'], equals('custom_value'));
+      });
+      
+      test('GeometryObject copyWithPreservingOtherMembers preserves other members', () {
+        final point = Point(coordinates: Position(10, 20));
+        final otherMembers = {'custom_field': 'custom_value'};
+        
+        // Set other members
+        point.setOtherMembers(otherMembers);
+        
+        // Create a new point with modified coordinates
+        final modifiedPoint = point.copyWithPreservingOtherMembers() as Point;
+        
+        // Verify coordinates are the same
+        expect(modifiedPoint.coordinates.lng, equals(10));
+        expect(modifiedPoint.coordinates.lat, equals(20));
+        
+        // Verify other members were preserved
+        expect(modifiedPoint.otherMembers['custom_field'], equals('custom_value'));
+      });
+    });
+  });
