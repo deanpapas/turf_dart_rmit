@@ -7,194 +7,197 @@ import 'package:turf/src/meta/geom.dart';
 import 'package:turf/src/meta/prop.dart';
 import 'package:turf/meta.dart';
 
-Feature<Point> pt = Feature<Point>(
-  geometry: Point(coordinates: Position(0, 0)),
-  properties: {
-    'a': 1,
-  },
-);
+void main() {
+  // Setup test fixtures
+  Feature<Point> pt = Feature<Point>(
+    geometry: Point(coordinates: Position(0, 0)),
+    properties: {
+      'a': 1,
+    },
+  );
 
-Feature<Point> pt2 = Feature<Point>(
-  geometry: Point(coordinates: Position(1, 1)),
-);
+  Feature<Point> pt2 = Feature<Point>(
+    geometry: Point(coordinates: Position(1, 1)),
+  );
 
-Feature<LineString> line = Feature<LineString>(
-  geometry: LineString(coordinates: [
-    Position(0, 0),
-    Position(1, 1),
-  ]),
-);
-
-Feature<Polygon> poly = Feature<Polygon>(
-  geometry: Polygon(coordinates: [
-    [
+  Feature<LineString> line = Feature<LineString>(
+    geometry: LineString(coordinates: [
       Position(0, 0),
       Position(1, 1),
-      Position(0, 1),
-      Position(0, 0),
-    ],
-  ]),
-);
+    ]),
+  );
 
-Feature<Polygon> polyWithHole = Feature<Polygon>(
-  geometry: Polygon(coordinates: [
-    [
-      Position(100.0, 0.0),
-      Position(101.0, 0.0),
-      Position(101.0, 1.0),
-      Position(100.0, 1.0),
-      Position(100.0, 0.0),
-    ],
-    [
-      Position(100.2, 0.2),
-      Position(100.8, 0.2),
-      Position(100.8, 0.8),
-      Position(100.2, 0.8),
-      Position(100.2, 0.2),
-    ],
-  ]),
-);
-
-Feature<MultiLineString> multiline = Feature<MultiLineString>(
-  geometry: MultiLineString(
-    coordinates: [
-      [
-        Position(0, 0),
-        Position(1, 1),
-      ],
-      [
-        Position(3, 3),
-        Position(4, 4),
-      ],
-    ],
-  ),
-);
-
-Feature<MultiPoint> multiPoint = Feature<MultiPoint>(
-  geometry: MultiPoint(
-    coordinates: [
-      Position(0, 0),
-      Position(1, 1),
-    ],
-  ),
-);
-
-Feature<MultiPolygon> multiPoly = Feature<MultiPolygon>(
-  geometry: MultiPolygon(coordinates: [
-    [
+  Feature<Polygon> poly = Feature<Polygon>(
+    geometry: Polygon(coordinates: [
       [
         Position(0, 0),
         Position(1, 1),
         Position(0, 1),
         Position(0, 0),
       ],
-    ],
-    [
+    ]),
+  );
+
+  Feature<Polygon> polyWithHole = Feature<Polygon>(
+    geometry: Polygon(coordinates: [
       [
-        Position(3, 3),
-        Position(2, 2),
-        Position(1, 2),
-        Position(3, 3),
+        Position(100.0, 0.0),
+        Position(101.0, 0.0),
+        Position(101.0, 1.0),
+        Position(100.0, 1.0),
+        Position(100.0, 0.0),
       ],
-    ],
-  ]),
-);
+      [
+        Position(100.2, 0.2),
+        Position(100.8, 0.2),
+        Position(100.8, 0.8),
+        Position(100.2, 0.8),
+        Position(100.2, 0.2),
+      ],
+    ]),
+  );
 
-Feature<GeometryCollection> geomCollection = Feature<GeometryCollection>(
-  geometry: GeometryCollection(
-    geometries: [
-      pt.geometry!,
-      line.geometry!,
-      multiline.geometry!,
-    ],
-  ),
-);
-
-FeatureCollection fcMixed = FeatureCollection(
-  features: [
-    Feature<Point>(
-      geometry: Point(
-        coordinates: Position(0, 0),
-      ),
-      properties: {'foo': 'bar'},
-    ),
-    Feature<LineString>(
-        geometry: LineString(coordinates: [
+  Feature<MultiLineString> multiline = Feature<MultiLineString>(
+    geometry: MultiLineString(
+      coordinates: [
+        [
+          Position(0, 0),
           Position(1, 1),
+        ],
+        [
+          Position(3, 3),
+          Position(4, 4),
+        ],
+      ],
+    ),
+  );
+
+  Feature<MultiPoint> multiPoint = Feature<MultiPoint>(
+    geometry: MultiPoint(
+      coordinates: [
+        Position(0, 0),
+        Position(1, 1),
+      ],
+    ),
+  );
+
+  Feature<MultiPolygon> multiPoly = Feature<MultiPolygon>(
+    geometry: MultiPolygon(coordinates: [
+      [
+        [
+          Position(0, 0),
+          Position(1, 1),
+          Position(0, 1),
+          Position(0, 0),
+        ],
+      ],
+      [
+        [
+          Position(3, 3),
           Position(2, 2),
-        ]),
-        properties: {'foo': 'buz'}),
-    Feature<MultiLineString>(
-        geometry: MultiLineString(
-          coordinates: [
-            [
-              Position(0, 0),
-              Position(1, 1),
-            ],
-            [
-              Position(4, 4),
-              Position(5, 5),
-            ],
-          ],
+          Position(1, 2),
+          Position(3, 3),
+        ],
+      ],
+    ]),
+  );
+
+  Feature<GeometryCollection> geomCollection = Feature<GeometryCollection>(
+    geometry: GeometryCollection(
+      geometries: [
+        pt.geometry!,
+        line.geometry!,
+        multiline.geometry!,
+      ],
+    ),
+  );
+
+  FeatureCollection fcMixed = FeatureCollection(
+    features: [
+      Feature<Point>(
+        geometry: Point(
+          coordinates: Position(0, 0),
         ),
-        properties: {'foo': 'qux'}),
-  ],
-);
-
-List<GeoJSONObject> collection(Feature feature) {
-  FeatureCollection featureCollection = FeatureCollection(
-    features: [
-      feature,
+        properties: {'foo': 'bar'},
+      ),
+      Feature<LineString>(
+          geometry: LineString(coordinates: [
+            Position(1, 1),
+            Position(2, 2),
+          ]),
+          properties: {'foo': 'buz'}),
+      Feature<MultiLineString>(
+          geometry: MultiLineString(
+            coordinates: [
+              [
+                Position(0, 0),
+                Position(1, 1),
+              ],
+              [
+                Position(4, 4),
+                Position(5, 5),
+              ],
+            ],
+          ),
+          properties: {'foo': 'qux'}),
     ],
   );
-  return [feature, featureCollection];
-}
 
-List<GeoJSONObject> featureAndCollection(GeometryObject geometry) {
-  Feature feature = Feature(
-    geometry: geometry,
-    properties: {
-      'a': 1,
-    },
-  );
-  FeatureCollection featureCollection = FeatureCollection(
-    features: [
-      feature,
-    ],
-  );
-  return [geometry, feature, featureCollection];
-}
+  // Helper functions
+  List<GeoJSONObject> collection(Feature feature) {
+    FeatureCollection featureCollection = FeatureCollection(
+      features: [
+        feature,
+      ],
+    );
+    return [feature, featureCollection];
+  }
 
-/// Returns a FeatureCollection with a total of 8 copies of [geometryType]
-/// in a mix of features of [geometryType], and features of geometry collections
-/// containing [geometryType]
-FeatureCollection<GeometryObject> getAsMixedFeatCollection(
-  GeometryType geometryType,
-) {
-  GeometryCollection geometryCollection = GeometryCollection(
-    geometries: [
-      geometryType,
-      geometryType,
-      geometryType,
-    ],
-  );
-  Feature geomCollectionFeature = Feature(
-    geometry: geometryCollection,
-  );
-  Feature geomFeature = Feature(
-    geometry: geometryType,
-  );
-  return FeatureCollection<GeometryObject>(
-    features: [
-      geomFeature,
-      geomCollectionFeature,
-      geomFeature,
-      geomCollectionFeature,
-    ],
-  );
-}
+  List<GeoJSONObject> featureAndCollection(GeometryObject geometry) {
+    Feature feature = Feature(
+      geometry: geometry,
+      properties: {
+        'a': 1,
+      },
+    );
+    FeatureCollection featureCollection = FeatureCollection(
+      features: [
+        feature,
+      ],
+    );
+    return [geometry, feature, featureCollection];
+  }
 
-void main() {
+  /// Returns a FeatureCollection with a total of 8 copies of [geometryType]
+  /// in a mix of features of [geometryType], and features of geometry collections
+  /// containing [geometryType]
+  FeatureCollection<GeometryObject> getAsMixedFeatCollection(
+    GeometryType geometryType,
+  ) {
+    GeometryCollection geometryCollection = GeometryCollection(
+      geometries: [
+        geometryType,
+        geometryType,
+        geometryType,
+      ],
+    );
+    Feature geomCollectionFeature = Feature(
+      geometry: geometryCollection,
+    );
+    Feature geomFeature = Feature(
+      geometry: geometryType,
+    );
+    return FeatureCollection<GeometryObject>(
+      features: [
+        geomFeature,
+        geomCollectionFeature,
+        geomFeature,
+        geomCollectionFeature,
+      ],
+    );
+  }
+
+  // Core metadata tests
   test('coordEach -- Point', () {
     featureAndCollection(pt.geometry!).forEach((input) {
       coordEach(input, (currentCoord, coordIndex, featureIndex,
@@ -787,6 +790,7 @@ void main() {
     expect(featureReduce<int>(fcMixed, countReducer, 5), 8);
     expect(featureReduce<int>(pt, countReducer, null), 1);
   });
+  
   test('flattenReduce -- with/out initialValue', () {
     int? countReducer(int? previousValue, Feature currentFeature,
         int featureIndex, int multiFeatureIndex) {
@@ -849,7 +853,7 @@ void main() {
     );
   });
 
-  test('geomReduce  -- no intial value and dynamic types', () {
+  test('geomReduce -- no initial value and dynamic types', () {
     LineString? lineGenerator(
       LineString? previousValue,
       GeometryType? currentGeometry,
@@ -1006,7 +1010,7 @@ void main() {
       final json = point.toJsonWithOtherMembers();
       
       // Verify standard fields
-      expect(json['type'], equals(GeoJSONObjectType.point));
+      expect(json['type'], equals('Point')); // Type is serialized as string
       expect(json['coordinates'], equals([10, 20]));
       
       // Verify other members
@@ -1034,7 +1038,7 @@ void main() {
     
     test('Feature with other members from JSON', () {
       final json = {
-        'type': GeoJSONObjectType.feature,
+        'type': 'Feature',
         'geometry': {
           'type': GeoJSONObjectType.point,
           'coordinates': [10, 20]
@@ -1048,7 +1052,7 @@ void main() {
       final feature = FeatureOtherMembersExtension.fromJsonWithOtherMembers(json);
       
       // Verify standard fields
-      expect(feature.type, equals(GeoJSONObjectType.feature));
+      expect(feature.type, equals(GeoJSONObjectType.feature)); 
       expect(feature.geometry?.type, equals(GeoJSONObjectType.point));
       expect(feature.properties?['name'], equals('Test Point'));
       
@@ -1059,7 +1063,7 @@ void main() {
     
     test('FeatureCollection with other members from JSON', () {
       final json = {
-        'type': GeoJSONObjectType.featureCollection,
+        'type': 'FeatureCollection',
         'features': [
           {
             'type': GeoJSONObjectType.feature,
@@ -1086,7 +1090,7 @@ void main() {
     
     test('GeometryObject with other members from JSON', () {
       final json = {
-        'type': GeoJSONObjectType.point,
+        'type': 'Point',
         'coordinates': [10, 20],
         'custom_field': 'custom_value'
       };
@@ -1195,3 +1199,4 @@ void main() {
       });
     });
   });
+}
