@@ -1,14 +1,15 @@
 import 'dart:math' as math;
 import 'package:turf/turf.dart';
 import 'helpers.dart';
+import 'package:turf/meta.dart';
 
 /// Calculates the great circle route between two points on a sphere 
 /// 
 /// Useful link: https://en.wikipedia.org/wiki/Great-circle_distance
  
-List<List<double>> greatCircle(
-  dynamic start,
-  dynamic end,
+Feature<GeometryType> greatCircle(
+  Position start,
+  Position end,
   { 
     Map <String, dynamic> properties = const {},
     int npoints = 100, // npoints = number of intermediate points less one (e.g if you want 5 intermediate points, set npoints = 6)
@@ -21,47 +22,47 @@ List<List<double>> greatCircle(
 
     // If start and end points are the same, 
     if (start[0] == end[0] && start[1] == end[1]) {
-      return List.generate(npoints, (_) => [start[0], start[1]]);
+      return Feature<LineString>(geometry: LineString(coordinates: []));
     }
     // Coordinate checking for valid values
-    if (start[0] < -90) {
+    if (start[0]! < -90) {
       throw ArgumentError("Starting latitude (vertical) coordinate is less than -90. This is not a valid coordinate.");
     } 
 
-    if (start[0] > 90) {
+    if (start[0]! > 90) {
       throw ArgumentError("Starting latitude (vertical) coordinate is greater than 90. This is not a valid coordinate.");
     }
 
-    if (start[1] < -180) {
+    if (start[1]! < -180) {
       throw ArgumentError('Starting longitude (horizontal) coordinate is less than -180. This is not a valid coordinate.');
     }
 
-    if (start[1] > 180) {
+    if (start[1]! > 180) {
       throw ArgumentError('Starting longitude (horizontal) coordinate is greater than 180. This is not a valid coordinate.');
     }
 
-    if (end[0] < -90) {
+    if (end[0]! < -90) {
       throw ArgumentError("Ending latitude (vertical) coordinate is less than -90. This is not a valid coordinate.");
     } 
 
-    if (end[0] > 90) {
+    if (end[0]! > 90) {
       throw ArgumentError("Ending latitude (vertical) coordinate is greater than 90. This is not a valid coordinate.");
     }
 
-    if (end[1] < -180) {
+    if (end[1]! < -180) {
       throw ArgumentError('Ending longitude (horizontal) coordinate is less than -180. This is not a valid coordinate.');
     }
 
-    if (end[1] > 180) {
+    if (end[1]! > 180) {
       throw ArgumentError('Ending longitude (horizontal) coordinate is greater than 180. This is not a valid coordinate.');
     }
     
-    List<List<double>> line = [];
+    List<Position> line = [];
 
-    num lat1 = degreesToRadians(start[0]);
-    num lng1 = degreesToRadians(start[1]);
-    num lat2 = degreesToRadians(end[0]);
-    num lng2 = degreesToRadians(end[1]);
+    num lng1 = degreesToRadians(start[0]);
+    num lat1 = degreesToRadians(start[1]);
+    num lng2 = degreesToRadians(end[0]);
+    num lat2 = degreesToRadians(end[1]);
     
     // Harvesine formula 
     for (int i = 0; i <= npoints; i++) {
@@ -78,16 +79,16 @@ List<List<double>> greatCircle(
     double lat = math.atan2(z, math.sqrt(x * x + y * y));
     double lng = math.atan2(y, x);
 
-    List<double> point = [double.parse(radiansToDegrees(lat).toStringAsFixed(2)), double.parse(radiansToDegrees(lng).toStringAsFixed(2))]; 
+    Position point = Position(lng, lat); 
     line.add(point);
     }
     /// Check for multilinestring if path crosses anti-meridian
-    bool crossAntiMeridian = (start[0] - end[0]).abs() > 180;
+    bool crossAntiMeridian = (start[1]! - end[1]!).abs() > 180;
 
     /// If it crossed antimeridian, we need to split our lines
     if (crossAntiMeridian) {
-      List<List<double>> multiLine = [];
-      List<List<double>> currentLine = [];
+      List<List<Position>> multiLine = [];
+      List<Position> currentLine = [];
 
       for (var point in line) {
         if ((point[0] - line[0][0]).abs() > 180) {
@@ -97,7 +98,7 @@ List<List<double>> greatCircle(
         currentLine.add(point);
       }
       multiLine.addAll(currentLine);
-      return multiLine;
+      return Feature<MultiLineString>(geometry: MultiLineString(coordinates: multiLine));
     }
-    return line;
+    return Feature<LineString>(geometry: LineString(coordinates: line));
 }
