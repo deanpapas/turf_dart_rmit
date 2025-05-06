@@ -1,7 +1,5 @@
 import 'dart:math' as math;
 import 'package:turf/turf.dart';
-import 'helpers.dart';
-import 'package:turf/meta.dart';
 
 /// Calculates the great circle route between two points on a sphere 
 /// 
@@ -59,10 +57,10 @@ Feature<GeometryType> greatCircle(
     
     List<Position> line = [];
 
-    num lng1 = degreesToRadians(start[0]);
-    num lat1 = degreesToRadians(start[1]);
-    num lng2 = degreesToRadians(end[0]);
-    num lat2 = degreesToRadians(end[1]);
+    num lng1 = degreesToRadians(start[0]!);
+    num lat1 = degreesToRadians(start[1]!);
+    num lng2 = degreesToRadians(end[0]!);
+    num lat2 = degreesToRadians(end[1]!);
     
     // Harvesine formula 
     for (int i = 0; i <= npoints; i++) {
@@ -83,7 +81,7 @@ Feature<GeometryType> greatCircle(
     line.add(point);
     }
     /// Check for multilinestring if path crosses anti-meridian
-    bool crossAntiMeridian = (start[1]! - end[1]!).abs() > 180;
+    bool crossAntiMeridian = (lng1 -lng2).abs() > 180;
 
     /// If it crossed antimeridian, we need to split our lines
     if (crossAntiMeridian) {
@@ -91,13 +89,13 @@ Feature<GeometryType> greatCircle(
       List<Position> currentLine = [];
 
       for (var point in line) {
-        if ((point[0] - line[0][0]).abs() > 180) {
-          multiLine.addAll(currentLine);
+        if ((point[0]! - line[0][0]!).abs() > 180) {
+          multiLine.addAll([currentLine]);
           currentLine = [];
         }
         currentLine.add(point);
       }
-      multiLine.addAll(currentLine);
+      multiLine.addAll([currentLine]);
       return Feature<MultiLineString>(geometry: MultiLineString(coordinates: multiLine));
     }
     return Feature<LineString>(geometry: LineString(coordinates: line));
