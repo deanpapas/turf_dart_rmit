@@ -1,6 +1,46 @@
-import 'package:geotypes/geotypes.dart';
-import 'package:turf/bbox.dart';
+class Point {
+  final double x, y;
+  Point(this.x, this.y);
 
+  @override
+  String toString() => '[$x, $y]';
+}
+
+typedef BBox = List<double>; // [minX, minY, maxX, maxY]
+
+// Bit code reflects the point position relative to the bbox
+int bitCode(Point p, BBox bbox) {
+  int code = 0;
+  if (p.x < bbox[0]) code |= 1; // left
+  else if (p.x > bbox[2]) code |= 2; // right
+  if (p.y < bbox[1]) code |= 4; // bottom
+  else if (p.y > bbox[3]) code |= 8; // top
+  return code;
+}
+
+// Intersection of a segment against one of the bbox edges
+Point intersect(Point a, Point b, int edge, BBox bbox) {
+  if ((edge & 8) != 0) {
+    // top
+    double x = a.x + (b.x - a.x) * (bbox[3] - a.y) / (b.y - a.y);
+    return Point(x, bbox[3]);
+  } else if ((edge & 4) != 0) {
+    // bottom
+    double x = a.x + (b.x - a.x) * (bbox[1] - a.y) / (b.y - a.y);
+    return Point(x, bbox[1]);
+  } else if ((edge & 2) != 0) {
+    // right
+    double y = a.y + (b.y - a.y) * (bbox[2] - a.x) / (b.x - a.x);
+    return Point(bbox[2], y);
+  } else if ((edge & 1) != 0) {
+    // left
+    double y = a.y + (b.y - a.y) * (bbox[0] - a.x) / (b.x - a.x);
+    return Point(bbox[0], y);
+  }
+  throw Exception("No intersection found");
+}
+
+// Cohen-Sutherland line clipping for polylines
 List<List<Point>> lineclip(List<Point> points, BBox bbox, [List<List<Point>>? result]) {
   int len = points.length;
   int codeA = bitCode(points[0], bbox);
@@ -16,11 +56,10 @@ List<List<Point>> lineclip(List<Point> points, BBox bbox, [List<List<Point>>? re
     while (true) {
       if ((codeA | codeB) == 0) {
         part.add(a);
-
         if (codeB != lastCode) {
           part.add(b);
           if (i < len - 1) {
-            result.add(part);
+            result.add(List<Point>.from(part));
             part = [];
           }
         } else if (i == len - 1) {
@@ -37,91 +76,45 @@ List<List<Point>> lineclip(List<Point> points, BBox bbox, [List<List<Point>>? re
         codeB = bitCode(b, bbox);
       }
     }
-
     codeA = lastCode;
   }
 
-  if (part.isNotEmpty) result.add(part);
-
+  if (part.isNotEmpty) result.add(List<Point>.from(part));
   return result;
 }
 
+// Sutherland-Hodgman polygon clipping
 List<Point> polygonclip(List<Point> points, BBox bbox) {
   List<Point> result = [];
+  int edge;
+  Point prev;
+  bool prevInside;
+  int i;
+  Point p;
+  bool inside;
 
-  for (int edge = 1; edge <= 8; edge *= 2) {
+  for (edge = 1; edge <= 8; edge *= 2) {
     result = [];
-    Point prev = points.last;
-    bool prevInside = (bitCode(prev, bbox) & edge) == 0;
+    prev = points[points.length - 1];
+    prevInside = (bitCode(prev, bbox) & edge) == 0;
 
-    for (Point p in points) {
-      bool inside = (bitCode(p, bbox) & edge) == 0;
+    for (i = 0; i < points.length; i++) {
+      p = points[i];
+      inside = (bitCode(p, bbox) & edge) == 0;
 
       if (inside != prevInside) {
         result.add(intersect(prev, p, edge, bbox));
       }
-
-      if (inside) {
-        result.add(p);
-      }
+      if (inside) result.add(p);
 
       prev = p;
       prevInside = inside;
     }
 
-    points = result;
+    points = List<Point>.from(result);
 
     if (points.isEmpty) break;
   }
 
   return result;
-}
-
-Point intersect(Point a, Point b, int edge, BBox bbox) {
-  double ax = a.longitude;
-  double ay = a.latitude;
-  double bx = b.longitude;
-  double by = b.latitude;
-Point pt = Point(
-    coordinates: Position(0, 0),
-  );
-  if ((edge & 8) != 0) {
-    // top
-    double x = ax + (bx - ax) * (bbox.lat2 - ay) / (by - ay);
-    return Point(coordinates: Position(x, bbox.lat2));
-  } else if ((edge & 4) != 0) {
-    // bottom
-    double x = ax + (bx - ax) * (bbox.lat1 - ay) / (by - ay);
-    return Point(coordinates: Position(x, bbox.lat1));
-  } else if ((edge & 2) != 0) {
-    // right
-    double y = ay + (by - ay) * (bbox.lng2 - ax) / (bx - ax);
-    return Point(coordinates: Position(bbox.lng2, y));
-  } else if ((edge & 1) != 0) {
-    // left
-    double y = ay + (by - ay) * (bbox.lng1 - ax) / (bx - ax);
-    return Point(coordinates: Position(bbox.lng1, y));
-  }
-
-  throw ArgumentError('Invalid edge');
-}
-
-int bitCode(Point p, BBox bbox) {
-  int code = 0;
-  double x = p.longitude;
-  double y = p.latitude;
-
-  if (x < bbox.lng1) {
-    code |= 1; // left
-  } else if (x > bbox.lng2) {
-    code |= 2; // right
-  }
-
-  if (y < bbox.lat1) {
-    code |= 4; // bottom
-  } else if (y > bbox.lat2) {
-    code |= 8; // top
-  }
-
-  return code;
 }
