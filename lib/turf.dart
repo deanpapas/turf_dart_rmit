@@ -37,6 +37,7 @@ export 'polygon_to_line.dart';
 export 'polygonize.dart';
 export 'points_within_polygon.dart';
 export 'polyline.dart';
+export 'sample.dart';
 export 'square.dart';
 export 'transform.dart';
 export 'truncate.dart';
