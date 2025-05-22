@@ -13,8 +13,10 @@
 
 import 'package:turf/helpers.dart';
 import 'package:turf/src/invariant.dart';
+import 'package:turf/src/booleans/boolean_clockwise.dart';
 
 import 'polygonize/polygonize.dart';
+import 'polygonize/config.dart';
 
 /// Converts a collection of LineString features to a collection of Polygon features.
 ///
@@ -44,6 +46,6 @@ import 'polygonize/polygonize.dart';
 ///
 /// var polygons = polygonize(lines);
 /// ```
-FeatureCollection<Polygon> polygonize(GeoJSONObject geoJSON) {
-  return Polygonizer.polygonize(geoJSON);
+FeatureCollection<Polygon> polygonize(GeoJSONObject geoJSON, {PolygonizeConfig? config}) {
+  return Polygonizer.polygonize(geoJSON, config: config);
 }

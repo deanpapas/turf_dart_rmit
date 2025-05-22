@@ -15,13 +15,15 @@ class Edge {
 
   /// Get canonical edge key (ordered by coordinates)
   String get key {
-    return from.toString().compareTo(to.toString()) <= 0 
-        ? '${from.toString()}|${to.toString()}' 
-        : '${to.toString()}|${from.toString()}';
+    final fromKey = '${from[0]},${from[1]}';
+    final toKey = '${to[0]},${to[1]}';
+    return fromKey.compareTo(toKey) <= 0 
+        ? '$fromKey|$toKey' 
+        : '$toKey|$fromKey';
   }
 
   /// Get the key as directed edge
-  String get directedKey => '${from.toString()}|${to.toString()}';
+  String get directedKey => '${from[0]},${from[1]}|${to[0]},${to[1]}';
 
   /// Create a reversed edge
   Edge reversed() => Edge(to, from);
@@ -47,7 +49,7 @@ class Node {
   }
 
   /// Get string representation for use as a map key
-  String get key => position.toString();
+  String get key => '${position[0]},${position[1]}';
 }
 
 /// Graph representing a planar graph of edges and nodes
@@ -76,14 +78,14 @@ class Graph {
     edges[edgeKey] = edge;
 
     // Add from node if it doesn't exist
-    final fromKey = from.toString();
+    final fromKey = '${from[0]},${from[1]}';
     if (!nodes.containsKey(fromKey)) {
       nodes[fromKey] = Node(from);
     }
     nodes[fromKey]!.addEdge(edge);
 
     // Add to node if it doesn't exist
-    final toKey = to.toString();
+    final toKey = '${to[0]},${to[1]}';
     if (!nodes.containsKey(toKey)) {
       nodes[toKey] = Node(to);
     }
@@ -96,7 +98,7 @@ class Graph {
   
   /// Add edge to the index for efficient lookup by vertex
   void _addToEdgesByVertex(Position from, Position to) {
-    final fromKey = from.toString();
+    final fromKey = '${from[0]},${from[1]}';
     if (!edgesByVertex.containsKey(fromKey)) {
       edgesByVertex[fromKey] = [];
     }
@@ -122,8 +124,9 @@ class Graph {
   
   /// Create a canonical edge key
   String _createEdgeKey(Position from, Position to) {
-    final fromKey = from.toString();
-    final toKey = to.toString();
+    // Create a key based on the actual coordinate values, not the default toString()
+    final fromKey = '${from[0]},${from[1]}';
+    final toKey = '${to[0]},${to[1]}';
     return fromKey.compareTo(toKey) < 0 ? '$fromKey|$toKey' : '$toKey|$fromKey';
   }
   

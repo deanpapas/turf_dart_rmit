@@ -10,6 +10,7 @@ class RingFinder {
 
   /// Find all rings in the graph
   List<List<Position>> findRings() {
+    // Create a copy of all edges
     final allEdges = Map<String, Edge>.from(graph.edges);
     final rings = <List<Position>>[];
 
@@ -75,7 +76,7 @@ class RingFinder {
   /// Find the next edge with the smallest clockwise angle from the incoming edge
   Edge? _findNextEdgeByAngle(Position currentPos, Edge? previousEdge, Map<String, Edge> availableEdges) {
     final candidates = <EdgeWithBearing>[];
-    final currentKey = currentPos.toString();
+    final currentKey = '${currentPos[0]},${currentPos[1]}';
     
     // Calculate incoming bearing if we have a previous edge
     num incomingBearing = 0;
@@ -84,19 +85,21 @@ class RingFinder {
       incomingBearing = (_calculateBearing(previousEdge.to, previousEdge.from) + 180) % 360;
     }
     
-    // Find all edges connected to the current position
-    for (final edge in availableEdges.values) {
-      final fromKey = edge.from.toString();
-      final toKey = edge.to.toString();
-      
-      if (fromKey == currentKey) {
-        // Outgoing edge
-        final bearing = _calculateBearing(currentPos, edge.to);
-        candidates.add(EdgeWithBearing(edge, bearing));
-      } else if (toKey == currentKey) {
-        // Incoming edge (needs to be reversed)
-        final bearing = _calculateBearing(currentPos, edge.from);
-        candidates.add(EdgeWithBearing(Edge(edge.to, edge.from), bearing));
+    // Use the precomputed edge index from the graph
+    final outgoingEdges = graph.edgesByVertex[currentKey] ?? [];
+    
+    // Find available outgoing edges
+    for (final edgeWithBearing in outgoingEdges) {
+      // Check if this edge is still available (not used yet)
+      final edgeKey = edgeWithBearing.edge.directedKey;
+      if (availableEdges.containsKey(edgeKey)) {
+        candidates.add(edgeWithBearing);
+      } else {
+        // Also check the canonical key since we store edges canonically
+        final canonicalKey = edgeWithBearing.edge.key;
+        if (availableEdges.containsKey(canonicalKey)) {
+          candidates.add(edgeWithBearing);
+        }
       }
     }
     
@@ -117,10 +120,12 @@ class RingFinder {
   
   /// Calculate bearing between two positions
   num _calculateBearing(Position start, Position end) {
-    num lng1 = _degreesToRadians(start[0]!);
-    num lng2 = _degreesToRadians(end[0]!);
-    num lat1 = _degreesToRadians(start[1]!);
-    num lat2 = _degreesToRadians(end[1]!);
+    // Safe coordinate access with default values
+    num lng1 = _degreesToRadians(start[0] ?? 0.0);
+    num lng2 = _degreesToRadians(end[0] ?? 0.0);
+    num lat1 = _degreesToRadians(start[1] ?? 0.0);
+    num lat2 = _degreesToRadians(end[1] ?? 0.0);
+    
     num a = sin(lng2 - lng1) * cos(lat2);
     num b = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(lng2 - lng1);
 
@@ -131,8 +136,8 @@ class RingFinder {
 
   /// Create a canonical edge key
   String _createEdgeKey(Position from, Position to) {
-    final fromKey = from.toString();
-    final toKey = to.toString();
+    final fromKey = '${from[0]},${from[1]}';
+    final toKey = '${to[0]},${to[1]}';
     return fromKey.compareTo(toKey) < 0 ? '$fromKey|$toKey' : '$toKey|$fromKey';
   }
   
