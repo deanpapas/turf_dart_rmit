@@ -5,54 +5,37 @@ import 'package:turf/turf.dart';
 // Returns a random Point 
 // Dart Random function module is obtained from dart:math
 
-Point randomPoint(int? count, {BBox? bbox}) {
-  if (bbox != null) {
-  checkBBox(bbox);
+FeatureCollection<Point> randomPoint(int? count, {BBox? bbox}) {
+  count = validateCount(count); // Ensure count is valid
+
+  List<Feature<Point>> features = [];
+  for (int i = 0; i < count; i++) {
+    features.add(Feature(geometry: randomPointUnchecked(bbox))); // Wrap Point in Feature
   }
-  return randomPositionUnchecked(bbox); // to be fixed, look into random on turfJS
+
+  return FeatureCollection<Point>(features: features); // Properly return a FeatureCollection
 }
 
-// 
+int validateCount(int? count) {
+  return (count == null || count <= 0) ? 1: count;
+}
+
 Point randomPointUnchecked(BBox? bbox) {
-  if (bbox != null) {
-    return coord
-  }
+  Position pos = randomPositionUnchecked(bbox);
+  return Point(coordinates: pos);
 }
 
-
-
-
-
-/////////////////////////////
-Position randomPosition(BBox? bbox) {
-  checkBBox(bbox);
-  return randomPositionUnchecked(bbox); 
-}
-
-// Returns a Random Position without checking if it is valid
 Position randomPositionUnchecked(BBox? bbox) {
   if (bbox != null) {
     return coordInBBox(bbox);
   }
-  return Position(Random().nextDouble() * 360 - 180, Random().nextDouble() * 180 - 90); // else return any random coordinate on the globe 
+  return Position(Random().nextDouble() * 360 - 180, Random().nextDouble() * 180 -90);
 }
 
-// 
-void checkBBox(BBox? bbox) {
-  if (bbox == null) {
-    return; 
-  }
-}
 // Returns a 
 Position coordInBBox(BBox? bbox) {
-  if (bbox == null) {
-    throw ArgumentError("Bbox cannot be null.");
-  }
-  if (bbox.length != 4) {
-    throw ArgumentError("Bbox must contain exactly 4 values.");
-  }
   return Position(
-    bbox[0]! + Random().nextDouble() * (bbox[2]! - bbox[0]!),
+    bbox![0]! + Random().nextDouble() * (bbox[2]! - bbox[0]!),
     bbox[1]! + Random().nextDouble() * (bbox[3]! - bbox[1]!)
   );
 }
