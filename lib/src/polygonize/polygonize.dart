@@ -44,7 +44,7 @@ class Polygonizer {
   /// var polygons = polygonize(lines);
   /// ```
   static FeatureCollection<Polygon> polygonize(GeoJSONObject geoJSON, {PolygonizeConfig? config}) {
-    print('Starting polygonization process...');
+    // Start the polygonization process
     
     // Create a planar graph from all segments
     final graph = Graph();
@@ -55,11 +55,9 @@ class Polygonizer {
       
       if (geometry is LineString) {
         final coords = getCoords(geometry) as List<Position>;
-        print('Adding LineString with ${coords.length} coordinates');
         _addLineToGraph(graph, coords);
       } else if (geometry is MultiLineString) {
         final multiCoords = getCoords(geometry) as List<List<Position>>;
-        print('Adding MultiLineString with ${multiCoords.length} line segments');
         for (final coords in multiCoords) {
           _addLineToGraph(graph, coords);
         }
@@ -70,21 +68,12 @@ class Polygonizer {
       }
     });
     
-    // Debug info
-    print('Graph contains ${graph.edges.length} edges and ${graph.nodes.length} nodes');
-    for (final edge in graph.edges.values) {
-      print('Edge: ${edge.from} -> ${edge.to}');
-    }
-    
     // Find rings in the graph
     final ringFinder = RingFinder(graph);
     final rings = ringFinder.findRings();
     
-    print('Found ${rings.length} rings in graph');
-    
     // If no rings were found, try fallback approach
     if (rings.isEmpty) {
-      print('No rings found, trying fallback approach');
       
       // Extract nodes and try to form a ring
       final nodes = graph.nodes.values.map((node) => node.position).toList();
@@ -100,8 +89,6 @@ class Polygonizer {
         }
         
         if (ring.length >= 4) {
-          print('Created fallback ring with ${ring.length} points');
-          
           // Create a polygon from the ring
           final polygon = Polygon(coordinates: [ring]);
           return FeatureCollection<Polygon>(features: [
@@ -114,8 +101,6 @@ class Polygonizer {
     // Classify rings as exterior shells or holes
     final classifier = RingClassifier();
     final classifiedRings = classifier.classifyRings(rings);
-    
-    print('Classified ${classifiedRings.length} polygon groups');
     
     // Convert classified rings to polygons
     final outputFeatures = <Feature<Polygon>>[];
@@ -132,7 +117,6 @@ class Polygonizer {
     if (coords.length < 2) return;
     
     for (var i = 0; i < coords.length - 1; i++) {
-      print('Adding edge: ${coords[i]} -> ${coords[i + 1]}');
       graph.addEdge(coords[i], coords[i + 1]);
     }
   }
