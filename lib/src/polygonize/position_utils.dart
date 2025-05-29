@@ -7,14 +7,14 @@ class PositionUtils {
   static Position createPosition(Position source) {
     if (source.length > 2 && source[2] != null) {
       return Position.of([
-        source[0]!,
-        source[1]!,
-        source[2]!,
+        source[0] ?? 0.0,
+        source[1] ?? 0.0,
+        source[2] ?? 0.0,
       ]);
     } else {
       return Position.of([
-        source[0]!,
-        source[1]!,
+        source[0] ?? 0.0,
+        source[1] ?? 0.0,
       ]);
     }
   }
@@ -26,9 +26,9 @@ class PositionUtils {
     final p2 = positions[positions.length ~/ 3];
     final p3 = positions[positions.length * 2 ~/ 3];
     
-    // Calculate the centroid
-    final x = (p1[0]! + p2[0]! + p3[0]!) / 3;
-    final y = (p1[1]! + p2[1]! + p3[1]!) / 3;
+    // Calculate the centroid with safe access
+    final x = ((p1[0] ?? 0.0) + (p2[0] ?? 0.0) + (p3[0] ?? 0.0)) / 3;
+    final y = ((p1[1] ?? 0.0) + (p2[1] ?? 0.0) + (p3[1] ?? 0.0)) / 3;
     
     return Position.of([x, y]);
   }
@@ -50,8 +50,8 @@ class PositionUtils {
     // Sort nodes by angle from centroid
     final nodesCopy = List<Position>.from(nodes);
     nodesCopy.sort((a, b) {
-      final angleA = atan2(a[1]! - centroidY, a[0]! - centroidX);
-      final angleB = atan2(b[1]! - centroidY, b[0]! - centroidX);
+      final angleA = atan2((a[1] ?? 0.0) - centroidY, (a[0] ?? 0.0) - centroidX);
+      final angleB = atan2((b[1] ?? 0.0) - centroidY, (b[0] ?? 0.0) - centroidX);
       return angleA.compareTo(angleB);
     });
     
@@ -75,8 +75,8 @@ class PositionUtils {
     // Sort nodes by angle from centroid (counter-clockwise)
     final nodesCopy = List<Position>.from(nodes);
     nodesCopy.sort((a, b) {
-      final angleA = atan2(a[1]! - centroidY, a[0]! - centroidX);
-      final angleB = atan2(b[1]! - centroidY, b[0]! - centroidX);
+      final angleA = atan2((a[1] ?? 0.0) - centroidY, (a[0] ?? 0.0) - centroidX);
+      final angleB = atan2((b[1] ?? 0.0) - centroidY, (b[0] ?? 0.0) - centroidX);
       return angleB.compareTo(angleA); // Reversed comparison for CCW
     });
     
