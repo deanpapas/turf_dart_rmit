@@ -46,3 +46,4 @@ export 'sample.dart';
 export 'square.dart';
 export 'transform.dart';
 export 'truncate.dart';
+export 'union.dart';
