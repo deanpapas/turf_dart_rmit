@@ -16,6 +16,7 @@ export 'clusters.dart';
 export 'dbscan.dart';
 export 'destination.dart';
 export 'distance.dart';
+export 'envelope.dart';
 export 'explode.dart';
 export 'flatten.dart';
 export 'extensions.dart';
