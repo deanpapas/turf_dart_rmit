@@ -5,16 +5,10 @@ import 'package:turf/helpers.dart';
 import 'package:rbush/rbush.dart';
 import 'dart:math' as math;
 
-/// DBSCAN (Density-Based Spatial Clustering of Applications with Noise) is a data clustering algorithm.
-/// Given a set of points in some space, it groups together points that are closely packed together
-/// (points with many nearby neighbors), marking as outliers points that lie alone in low-density regions.
-///
-/// @param {FeatureCollection<Point>} points Input points
-/// @param {number} maxClusterLength Maximum number of points in a cluster
-/// @param {number} minPoints Minimum number of points to form a cluster
-/// @param {number} maxRadius Maximum radius between two points to be considered in the same neighborhood
-/// @param {boolean} [mutableInput=true] allows GeoJSON input to be mutated (significant performance increase if true)
-/// @returns {FeatureCollection<Point>} Clustered Points with an additional `cluster` property to each Point
+// DBSCAN (Density-Based Spatial Clustering of Applications with Noise) is a data clustering algorithm.
+// Given a set of points in some space, it groups together points that are closely packed together
+// (points with many nearby neighbors), marking as outliers points that lie alone in low-density regions.
+
 FeatureCollection<Point> dbscan(
   FeatureCollection<Point> points,
   int maxClusterLength,
