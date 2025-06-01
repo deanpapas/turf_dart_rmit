@@ -1,13 +1,26 @@
-import 'package:geotypes/geotypes.dart';
 import 'package:turf/clone.dart';
 import 'package:turf/distance.dart';
-import 'package:turf/helpers.dart';
+import 'package:turf/bbox.dart' as turf_bbox;
 import 'package:rbush/rbush.dart';
-import 'dart:math' as math;
 
 // DBSCAN (Density-Based Spatial Clustering of Applications with Noise) is a data clustering algorithm.
 // Given a set of points in some space, it groups together points that are closely packed together
 // (points with many nearby neighbors), marking as outliers points that lie alone in low-density regions.
+
+// A wrapper class to make GeoJSON features compatible with RBush spatial indexing.
+class SpatialFeature extends RBushElement<Feature<Point>> {
+  final Feature<Point> feature;
+
+  SpatialFeature(this.feature)
+      : assert(feature.bbox != null && feature.bbox!.length >= 4, 'Feature must have a bbox'),
+        super(
+          minX: feature.bbox![0]!.toDouble(),
+          minY: feature.bbox![1]!.toDouble(),
+          maxX: feature.bbox![2]!.toDouble(),
+          maxY: feature.bbox![3]!.toDouble(),
+          data: feature,
+        );
+}
 
 FeatureCollection<Point> dbscan(
   FeatureCollection<Point> points,
@@ -29,35 +42,45 @@ FeatureCollection<Point> dbscan(
   final noise = List<bool>.filled(numberOfPoints, false);
   int clusterId = 0;
 
-  // Build an R-tree index for efficient neighbor searching
-  final tree = RBush<Feature<Point>>(maxEntries: 9);
-  for (int i = 0; i < numberOfPoints; i++) {
-    final feature = clustered.features[i];
-    if (feature.geometry != null) {
-      tree.insert(feature.bbox!, feature);
+  // Ensure all features have a bounding box
+  for (final feature in clustered.features) {
+    if (feature.geometry != null && feature.bbox == null) {
+      feature.bbox = turf_bbox.bbox(feature);
     }
   }
+
+  // Build an R-tree index for efficient neighbor searching
+  final tree = RBush<Feature<Point>>();
+  for (int i = 0; i < numberOfPoints; i++) {
+    final feature = clustered.features[i];
+    if (feature.geometry != null && feature.bbox != null) {
+      tree.insert(SpatialFeature(feature));
+    }
+}
 
   // Function to find neighbors within a given radius
   List<int> getNeighbors(int pointIndex) {
     final neighbors = <int>[];
     final targetPoint = clustered.features[pointIndex];
-    if (targetPoint.geometry == null) {
+    if (targetPoint.geometry == null || targetPoint.bbox == null) {
       return neighbors;
     }
-    final envelope = [
-      targetPoint.bbox![0] - maxRadius,
-      targetPoint.bbox![1] - maxRadius,
-      targetPoint.bbox![2] + maxRadius,
-      targetPoint.bbox![3] + maxRadius,
-    ];
+
+    final envelope = RBushBox(
+      minX: targetPoint.bbox![0] - maxRadius,
+      minY: targetPoint.bbox![1] - maxRadius,
+      maxX: targetPoint.bbox![2] + maxRadius,
+      maxY: targetPoint.bbox![3] + maxRadius,
+    );
 
     final potentialNeighbors = tree.search(envelope);
-    for (final neighborFeature in potentialNeighbors) {
+    for (final wrapped in potentialNeighbors) {
+      final spatialFeature = wrapped as SpatialFeature;
+      final neighborFeature = spatialFeature.feature;
       final neighborIndex = clustered.features.indexOf(neighborFeature);
       if (pointIndex != neighborIndex) {
-        final distanceInMeters = distance(targetPoint, neighborFeature);
-        if (distanceInMeters <= maxRadius) {
+        final dist = distance(targetPoint.geometry!, neighborFeature.geometry!);
+        if (dist <= maxRadius) {
           neighbors.add(neighborIndex);
         }
       }
@@ -102,10 +125,10 @@ FeatureCollection<Point> dbscan(
     }
   }
 
-  // Add the 'cluster' property to noise points (set to null or -1)
+  // Mark noise points with null cluster
   for (int i = 0; i < numberOfPoints; i++) {
     if (noise[i]) {
-      clustered.features[i].properties['cluster'] = null; // Or -1
+      clustered.features[i].properties['cluster'] = null;
     }
   }
 
