@@ -71,4 +71,4 @@ Feature<dynamic>? intersect(FeatureCollection features, {Map<String, dynamic>? p
 //     coordinates: intersection as List<List<List<Position>>>
 //   );
 //   return Feature(geometry: multiPolygonGeometry, properties: properties ?? {});
-// }
+}

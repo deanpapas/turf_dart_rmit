@@ -65,4 +65,4 @@ Feature<dynamic>? union(FeatureCollection features, {Map<String, dynamic>? prope
 //     coordinates: unioned as List<List<List<Position>>>
 //   );
 //   return Feature(geometry: multiPolygonGeometry, properties: properties ?? {});
-// }
+}
