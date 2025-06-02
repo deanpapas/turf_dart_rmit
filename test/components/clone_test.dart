@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:turf/clone.dart'; // Adjust path to where your `clone` function lives
+import 'package:turf/clone.dart'; 
 
 void main() {
   group('GeoJSON clone tests', () {
@@ -16,7 +16,7 @@ void main() {
       final result = clone(input);
 
       expect(result, equals(input));
-      expect(identical(result, input), isFalse); // Ensure it's a deep clone
+      expect(identical(result, input), isFalse); 
     });
 
     test('Clones a LineString feature with properties', () {
@@ -37,7 +37,8 @@ void main() {
       final result = clone(input);
 
       expect(result, equals(input));
-      expect(result['properties'], isNot(same(input['properties'])));
+      expect(result?.containsKey('properties'), isTrue); 
+      expect(result?['properties'], isNot(same(input['properties']))); 
     });
 
     test('Clones a FeatureCollection', () {
@@ -69,7 +70,8 @@ void main() {
       final result = clone(input);
 
       expect(result, equals(input));
-      expect(result['features'][0], isNot(same(input['features'][0])));
+      expect(result?.containsKey('features'), isTrue); 
+      expect(result?['features']?[0], isNot(same(input['features'][0]))); 
     });
 
     test('Clones a GeometryCollection', () {
@@ -93,7 +95,8 @@ void main() {
       final result = clone(input);
 
       expect(result, equals(input));
-      expect(result['geometries'][1], isNot(same(input['geometries'][1])));
+      expect(result?.containsKey('geometries'), isTrue); 
+      expect(result?['geometries']?[1], isNot(same(input['geometries'][1]))); 
     });
 
     test('Throws error for null input', () {
