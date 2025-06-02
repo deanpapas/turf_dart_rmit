@@ -1,6 +1,6 @@
 import 'package:geotypes/geotypes.dart';
 import 'package:turf/meta.dart';
-import 'package:polyclip-dart/polyclip.dart'; // Polyclip-dart import (to be fixed)
+// import 'package:polyclip-dart/polyclip.dart'; // Uncomment Polyclip-dart import (to be fixed) after release
 
 // Coded the same as intersect on turf.js. Subject to change based on how polyclip-dart will read geojson objects.
 
@@ -54,21 +54,21 @@ Feature<dynamic>? intersect(FeatureCollection features, {Map<String, dynamic>? p
   }
   
   // Use polyclip library to find intersection
-  final intersection = Polyclip.intersection(geoms[0], [...geoms.sublist(1)]);
+  // final intersection = Polyclip.intersection(geoms[0], [...geoms.sublist(1)]);
   
-  if (intersection.isEmpty) {
-    return null;
-  }
+//   if (intersection.isEmpty) {
+//     return null;
+//   }
   
-  if (intersection.length == 1) {
-    // Create a polygon feature
-    final polygonGeometry = Polygon(coordinates: intersection[0] as List<List<Position>>);
-    return Feature(geometry: polygonGeometry, properties: properties ?? {});
-  }
+//   if (intersection.length == 1) {
+//     // Create a polygon feature
+//     final polygonGeometry = Polygon(coordinates: intersection[0] as List<List<Position>>);
+//     return Feature(geometry: polygonGeometry, properties: properties ?? {});
+//   }
   
-  // Create a multipolygon feature
-  final multiPolygonGeometry = MultiPolygon(
-    coordinates: intersection as List<List<List<Position>>>
-  );
-  return Feature(geometry: multiPolygonGeometry, properties: properties ?? {});
-}
+//   // Create a multipolygon feature
+//   final multiPolygonGeometry = MultiPolygon(
+//     coordinates: intersection as List<List<List<Position>>>
+//   );
+//   return Feature(geometry: multiPolygonGeometry, properties: properties ?? {});
+// }

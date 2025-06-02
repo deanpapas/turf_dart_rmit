@@ -1,6 +1,6 @@
 import 'package:geotypes/geotypes.dart';
 import 'package:turf/meta.dart';
-import 'package:polyclip-dart/polyclip.dart'; // TSubject to change as per polyclip-dart changes
+// import 'package:polyclip-dart/polyclip.dart'; // Uncomment after polyclip dart release
 
 /* Takes a collection of input polygons and returns a combined polygon. If the
   input polygons are not contiguous, this function returns a multi-polygon
@@ -47,22 +47,22 @@ Feature<dynamic>? union(FeatureCollection features, {Map<String, dynamic>? prope
     throw Exception('Must have at least 2 geometries');
   }
   
-  // Use polyclip library to find union
-  final unioned = Polyclip.union(geoms[0], [...geoms.sublist(1)]);
+  // Use polyclip library to find union and uncomment after polyclip-dart is released
+  // final unioned = Polyclip.union(geoms[0], [...geoms.sublist(1)]); 
   
-  if (unioned.isEmpty) {
-    return null;
-  }
+//   if (unioned.isEmpty) {
+//     return null;
+//   }
   
-  if (unioned.length == 1) {
-    // Create a polygon feature
-    final polygonGeometry = Polygon(coordinates: unioned[0] as List<List<Position>>);
-    return Feature(geometry: polygonGeometry, properties: properties ?? {});
-  }
+//   if (unioned.length == 1) {
+//     // Create a polygon feature
+//     final polygonGeometry = Polygon(coordinates: unioned[0] as List<List<Position>>);
+//     return Feature(geometry: polygonGeometry, properties: properties ?? {});
+//   }
   
-  // Create a multipolygon feature
-  final multiPolygonGeometry = MultiPolygon(
-    coordinates: unioned as List<List<List<Position>>>
-  );
-  return Feature(geometry: multiPolygonGeometry, properties: properties ?? {});
-}
+//   // Create a multipolygon feature
+//   final multiPolygonGeometry = MultiPolygon(
+//     coordinates: unioned as List<List<List<Position>>>
+//   );
+//   return Feature(geometry: multiPolygonGeometry, properties: properties ?? {});
+// }
