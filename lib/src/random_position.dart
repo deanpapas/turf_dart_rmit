@@ -12,13 +12,7 @@ Position randomPosition(BBox? bbox) {
 
 // Returns a Random Position without checking if it is valid
 Position randomPositionUnchecked(BBox? bbox) {
-  if (bbox != null) {
-    return coordInBBox(bbox);
-  }
-  return Position(
-      Random().nextDouble() * 360 - 180,
-      Random().nextDouble() * 180 -
-          90); // else return any random coordinate on the globe
+  return coordInBBox(bbox);
 }
 
 // Performs checks on bbox ensuring a bbox is provided, and contains 4 values.
