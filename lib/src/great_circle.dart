@@ -64,10 +64,10 @@ Feature<GeometryType> greatCircle(Position start, Position end,
   // Creates a list to store points for the great circle arc
   List<Position> line = [];
 
-  num lng1 = degreesToRadians(start[0]!);
-  num lat1 = degreesToRadians(start[1]!);
-  num lng2 = degreesToRadians(end[0]!);
-  num lat2 = degreesToRadians(end[1]!);
+  num lat1 = degreesToRadians(start[0]!);
+  num lng1 = degreesToRadians(start[1]!);
+  num lat2 = degreesToRadians(end[0]!);
+  num lng2 = degreesToRadians(end[1]!);
 
   // Harvesine formula
   for (int i = 0; i <= npoints; i++) {
@@ -111,5 +111,54 @@ Feature<GeometryType> greatCircle(Position start, Position end,
     return Feature<MultiLineString>(
         geometry: MultiLineString(coordinates: multiLine));
   }
+  return Feature<LineString>(geometry: LineString(coordinates: line));
+}
+
+Feature<GeometryType> debugGreatCircle(Position start, Position end,
+    {int npoints = 2}) {
+  print("Input start: Position(${start[0]}, ${start[1]})");
+  print("Input end: Position(${end[0]}, ${end[1]})");
+
+  // Current assignment (what you have)
+  num lng1 = degreesToRadians(start[0]!); // longitude
+  num lat1 = degreesToRadians(start[1]!); // latitude
+  num lng2 = degreesToRadians(end[0]!); // longitude
+  num lat2 = degreesToRadians(end[1]!); // latitude
+
+  print("After assignment:");
+  print("lng1 (from start[0]): ${radiansToDegrees(lng1)}");
+  print("lat1 (from start[1]): ${radiansToDegrees(lat1)}");
+  print("lng2 (from end[0]): ${radiansToDegrees(lng2)}");
+  print("lat2 (from end[1]): ${radiansToDegrees(lat2)}");
+
+  List<Position> line = [];
+
+  // Just add the start and end points to see what happens
+  for (int i = 0; i <= npoints; i++) {
+    double f = i / npoints;
+
+    if (f == 0) {
+      // Start point
+      Position point = Position(lng1, lat1);
+      line.add(point);
+      print(
+          "Start point created: Position(${lng1}, ${lat1}) = [${radiansToDegrees(lng1)}, ${radiansToDegrees(lat1)}]");
+    } else if (f == 1) {
+      // End point
+      Position point = Position(lng2, lat2);
+      line.add(point);
+      print(
+          "End point created: Position(${lng2}, ${lat2}) = [${radiansToDegrees(lng2)}, ${radiansToDegrees(lat2)}]");
+    } else {
+      // For simplicity, just add a midpoint
+      double midLng = (lng1 + lng2) / 2;
+      double midLat = (lat1 + lat2) / 2;
+      Position point = Position(midLng, midLat);
+      line.add(point);
+      print(
+          "Mid point created: Position(${midLng}, ${midLat}) = [${radiansToDegrees(midLng)}, ${radiansToDegrees(midLat)}]");
+    }
+  }
+
   return Feature<LineString>(geometry: LineString(coordinates: line));
 }
