@@ -4,26 +4,29 @@ import 'package:turf/boolean.dart';
 // Takes in a GeoJSON Object
 // Returns a GeoJSON like Polygon
 
-
 GeoJSONObject rewind(
   GeoJSONObject geojson, {
   bool reverse = false,
 }) {
-
   // Feature or Geometry Collections
   if (geojson is GeometryCollection) {
-    final newGeometries = geojson.geometries.map((geometry) {
-      final rewinds = rewindFeature(geometry, reverse);
-      return rewinds is GeometryType ? rewinds : null;
-    }).whereType<GeometryType>().toList();
-    return GeometryCollection(geometries: newGeometries, bbox: geojson.bbox?.clone());
+    final newGeometries = geojson.geometries
+        .map((geometry) {
+          final rewinds = rewindFeature(geometry, reverse);
+          return rewinds is GeometryType ? rewinds : null;
+        })
+        .whereType<GeometryType>()
+        .toList();
+    return GeometryCollection(
+        geometries: newGeometries, bbox: geojson.bbox?.clone());
   }
 
   if (geojson is FeatureCollection) {
     final newFeatures = geojson.features.map((feature) {
       return rewindFeature(feature, reverse) as Feature;
     }).toList();
-    return FeatureCollection(features: newFeatures, bbox: geojson.bbox?.clone());
+    return FeatureCollection(
+        features: newFeatures, bbox: geojson.bbox?.clone());
   }
 
   // Else individual features/geometries
@@ -32,11 +35,15 @@ GeoJSONObject rewind(
 
 GeoJSONObject rewindFeature(GeoJSONObject geojson, bool reverse) {
   if (geojson is GeometryCollection) {
-    final newGeometries = geojson.geometries.map((geometry) {
-      final rewinds = rewindFeature(geojson, reverse);
-      return rewinds is GeometryCollection ? rewinds : null;
-    }).whereType<GeometryType>().toList();
-    return GeometryCollection(geometries: newGeometries, bbox: geojson.bbox?.clone());
+    final newGeometries = geojson.geometries
+        .map((geometry) {
+          final rewinds = rewindFeature(geometry, reverse);
+          return rewinds is GeometryCollection ? rewinds : null;
+        })
+        .whereType<GeometryType>()
+        .toList();
+    return GeometryCollection(
+        geometries: newGeometries, bbox: geojson.bbox?.clone());
   }
 
   // Converting to different GeoJSON objects and returning respective object
@@ -71,16 +78,11 @@ GeoJSONObject rewindFeature(GeoJSONObject geojson, bool reverse) {
       bbox: geojson.bbox?.clone(),
     );
   }
-
   return geojson;
 }
 
 List<Position> rewindLineString(List<Position> coords, bool reverse) {
-  if (booleanClockwise(LineString(coordinates: coords)) == reverse) {
-    return coords.reversed.toList();
-  }
-
-  return coords.toList();
+  return reverse ? coords.reversed.toList() : coords.toList();
 }
 
 List<List<Position>> rewindPolygon(List<List<Position>> coords, bool reverse) {
