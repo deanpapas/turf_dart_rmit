@@ -11,6 +11,8 @@
 ![dart unit tests](https://github.com/dartclub/turf_dart/actions/workflows/dart-unit-tests.yml/badge.svg)
 ![dart publish](https://github.com/dartclub/turf_dart/actions/workflows/dart-pub-publish.yml/badge.svg)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+![GitHub URL of Turf Dart](https://github.com/dartclub/turf_dart) 
+![GitHub URL of Turf Dart RMIT](https://github.com/deanpapas/turf_dart_rmit) 
 
 <h3>–> <a href="https://discord.gg/TcHhfTVWVK">Join our Dart / Flutter GIS Community on Discord</a> <–</h3>
 
@@ -84,3 +86,91 @@ Tests are run with `dart test` and benchmarks can be run with
 Any new benchmarks must be named `*_benchmark.dart` and reside in the
 `./benchmark` folder.
   
+## CHANGELOG
+## 0.0.11
+- Implements square, envelope, pointonfeature, greatcircle, polgontangents, WSG84 member functions, CentreOfMass, CopyWith(options) method, toMercator member functions, bbox, GeoJSON Support for "other members", index, operation (PolygonClippingPackage), toWgs84, toMercator, Combine, Flatten, RandomPosition, RandomLineString, Flip, RandomPoint, Rewind, BboxClip, Polyclip dart testing, Polygonize, ClustersDbscan, Clone, PointsWithinPolygon, Sample [Turf_dart_rmit](https://github.com/deanpapas/turf_dart_rmit)
+- Implements bbox (PolygonClippingPackage), compare (PolygonClippingPackage), constants (PolygonClippingPackage), geom-in (PolygonClippingPackage), geom-out (PolygonClippingPackage), identity (PolygonClippingPackage), orient (PolygonClippingPackage), precision (PolygonClippingPackage), segment (PolygonClippingPackage), snap (PolygonClippingPackage), sweep-events (PolygonClippingPackage), sweep-line (PolygonClippingPackage), Union, intersection [polyclip-dart](https://github.com/deanpapas/polyclip-dart)
+## 0.0.10
+
+- Implements `lineSlice` [#158](https://github.com/dartclub/turf_dart/pull/158)
+- Introduce [geotypes package](https://pub.dev/packages/geotypes) for GeoJSON serialization
+- Other small improvements
+
+## 0.0.9
+
+- Implements `length`, `along` [#153](https://github.com/dartclub/turf_dart/pull/153)
+- Documentation: Improves pub.dev scores by fixing bad links in Readme.md
+
+## 0.0.8
+
+- Implements `transformRotate`, `rhumbDistance`, `rhumbDestination`, `centroid` [#147](https://github.com/dartclub/turf_dart/pull/147)
+- Introduce `localCoordIndex` in `coordEach`
+- Implements all the `boolean`* functions [#91](https://github.com/dartclub/turf_dart/pull/91)
+- Implements `area` function [#123](https://github.com/dartclub/turf_dart/pull/123)
+- Implements `polygonSmooth` function [#127](https://github.com/dartclub/turf_dart/pull/127)
+- Fixes missing parameter in nearest point on line [#145](https://github.com/dartclub/turf_dart/pull/145)
+- Other core improvements
+- Support for Dart 3
+
+## 0.0.7
+
+- Implements `nearestPointOn(Multi)Line` [#87](https://github.com/dartclub/turf_dart/pull/87)
+- Implements `explode` function [#93](https://github.com/dartclub/turf_dart/pull/93)
+- Implements `bbox-polygon` and `bbox`, `center`, polyline functions [#99](https://github.com/dartclub/turf_dart/pull/99)
+- Updates the `BBox`-class constructor [#100](https://github.com/dartclub/turf_dart/pull/100)
+- Implements `rhumbBearing` function [#109](https://github.com/dartclub/turf_dart/pull/109)
+- Implements `lineToPolygon` and `polygonToLine` functions [#104](https://github.com/dartclub/turf_dart/pull/104)
+- Implements `truncate` function [#111](https://github.com/dartclub/turf_dart/pull/111)
+- Implements `cleanCoord` function [#112](https://github.com/dartclub/turf_dart/pull/112)
+- Some documentation & README improvements
+
+## 0.0.6+3
+
+- Rename examples file
+
+## 0.0.6+2
+
+- Added code examples
+- Fixed segment * callbacks
+
+## 0.0.6
+
+- This is solely a quality release, without new functionality:
+- Documentation: improves pub.dev scores, raised documentation coverage, fixed typos
+- Return type fixes for the the meta extensions
+
+## 0.0.5
+
+
+- Implements *all* meta functions and `lineSegment`
+- Adds a lot of documentation
+- Several bug and type fixes
+
+## 0.0.4
+
+- Implements the `featureEach` and `propEach` meta function. [#24](https://github.com/dartclub/turf_dart/pull/24)
+- PR [#43](https://github.com/dartclub/turf_dart/pull/43):
+  - Several bugfixes with the deserialization of JSON
+  - Several new constructors
+  - Vector arithmetics operations
+
+## 0.0.3
+
+- Null-safety support
+
+## 0.0.2+3
+
+Implements the `geomEach` meta function. [#13](https://github.com/dartclub/turf_dart/pull/13)
+
+## 0.0.2+1
+
+- initialize lists and maps empty in constructors, if not provided
+
+## 0.0.2
+
+- normalization for coordinates (Position)
+- and yes, it's still under heavy development
+
+## 0.0.1
+
+- Initial version, still under heavy development
